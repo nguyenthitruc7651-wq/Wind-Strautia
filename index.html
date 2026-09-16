@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>KAISOUL Weather - Simulator</title>
+
+  <!-- Leaflet CSS & JS (Bản đồ nền tương tác) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+
+  <!-- Container Bản đồ -->
+  <div id="map"></div>
+
+  <!-- Canvas vẽ Hạt Gió & Lớp Mưa Giả Lập -->
+  <canvas id="weatherCanvas"></canvas>
+
+  <!-- Header / Disclaimer Warning -->
+  <div class="disclaimer-banner">
+    <span>⚠️ Dữ liệu thời tiết được mô phỏng — không dùng cho mục đích dự báo.</span>
+  </div>
+
+  <!-- Bảng Tìm Kiếm (Search Box) -->
+  <div class="search-container" id="searchContainer">
+    <div class="search-input-wrapper">
+      <i class="fa-solid fa-magnifying-glass search-icon"></i>
+      <input type="text" id="searchInput" placeholder="Tìm thành phố (VD: Hà Nội, Tokyo, New York)..." autocomplete="off">
+      <button id="clearSearch" class="btn-clear"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="search-results" id="searchResults"></div>
+  </div>
+
+  <!-- Thanh Công Cụ Bên Phải (Right Action Bar) -->
+  <div class="toolbar-right">
+    <button class="tool-btn" id="btnReset" title="Reset World Map"><i class="fa-solid fa-house"></i></button>
+    <button class="tool-btn" id="btnToggleSearch" title="Tìm kiếm"><i class="fa-solid fa-magnifying-glass"></i></button>
+    <button class="tool-btn" id="btnLocation" title="Vị trí hiện tại"><i class="fa-solid fa-location-crosshairs"></i></button>
+    <button class="tool-btn" id="btnFavorite" title="Yêu thích"><i class="fa-solid fa-heart"></i></button>
+    <button class="tool-btn" id="btnMenu" title="Menu Lớp Dữ Liệu"><i class="fa-solid fa-bars"></i></button>
+  </div>
+
+  <!-- Popup Menu Lớp Dữ Liệu (Layer Select Menu) -->
+  <div class="layer-menu glass-panel hidden" id="layerMenu">
+    <h3>Lớp Thời Tiết Giả Lập</h3>
+    <label class="toggle-item">
+      <span><i class="fa-solid fa-wind"></i> Dòng Gió (Wind Particles)</span>
+      <input type="checkbox" id="layerWind" checked>
+      <span class="slider"></span>
+    </label>
+    <label class="toggle-item">
+      <span><i class="fa-solid fa-cloud-showers-heavy"></i> Lớp Mưa (Rain Overlay)</span>
+      <input type="checkbox" id="layerRain" checked>
+      <span class="slider"></span>
+    </label>
+    <label class="toggle-item">
+      <span><i class="fa-solid fa-hurricane"></i> Hệ Thống Bão (Storms)</span>
+      <input type="checkbox" id="layerStorms" checked>
+      <span class="slider"></span>
+    </label>
+    <label class="toggle-item">
+      <span><i class="fa-solid fa-temperature-high"></i> Nhiệt Độ (Simulated)</span>
+      <input type="checkbox" id="layerTemp">
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <!-- Card Thông Tin Chi Tiết Điểm Click (Weather Info Panel) -->
+  <div class="info-card glass-panel hidden" id="infoCard">
+    <button class="close-card" id="closeCard"><i class="fa-solid fa-xmark"></i></button>
+    <h3 id="cardTitle">Tọa Độ Giả Lập</h3>
+    <div class="card-grid">
+      <div class="card-item"><i class="fa-solid fa-wind"></i> Gió: <strong id="valWind">-- km/h</strong></div>
+      <div class="card-item"><i class="fa-solid fa-compass"></i> Hướng: <strong id="valDir">--°</strong></div>
+      <div class="card-item"><i class="fa-solid fa-cloud-rain"></i> Mưa: <strong id="valRain">-- mm/h</strong></div>
+      <div class="card-item"><i class="fa-solid fa-temperature-three-quarters"></i> Nhiệt: <strong id="valTemp">-- °C</strong></div>
+      <div class="card-item"><i class="fa-solid fa-gauge-high"></i> Áp suất: <strong id="valPress">-- hPa</strong></div>
+      <div class="card-item"><i class="fa-solid fa-map-pin"></i> Vĩ/Kinh: <strong id="valCoords">--</strong></div>
+    </div>
+  </div>
+
+  <!-- Legend Chú Giải Màu Sắc -->
+  <div class="legend-bar glass-panel">
+    <span class="legend-title">km/h</span>
+    <div class="legend-colors">
+      <span style="background: #2b83ba;">0</span>
+      <span style="background: #abdda4;">10</span>
+      <span style="background: #ffffbf;">20</span>
+      <span style="background: #fdae61;">35</span>
+      <span style="background: #d7191c;">55</span>
+      <span style="background: #a6d96a;">70</span>
+      <span style="background: #8e0152;">100+</span>
+    </div>
+  </div>
+
+  <!-- Thanh Timeline Phía Dưới (Bottom Control Bar) -->
+  <div class="timeline-container glass-panel">
+    <button class="play-btn" id="btnPlayPause"><i class="fa-solid fa-play"></i></button>
+    <div class="timeline-slider-wrapper">
+      <input type="range" id="timelineRange" min="0" max="24" step="1" value="0">
+      <div class="timeline-ticks">
+        <span>Hiện tại</span>
+        <span>+3h</span>
+        <span>+6h</span>
+        <span>+12h</span>
+        <span>+18h</span>
+        <span>+24h</span>
+      </div>
+    </div>
+    <div class="time-display" id="timeDisplay">18:00 - Hôm nay</div>
+  </div>
+
+  <!-- Javascript Modules -->
+  <script src="src/simulation.js"></script>
+  <script src="src/map.js"></script>
+  <script src="src/wind.js"></script>
+  <script src="src/rain.js"></script>
+  <script src="src/storms.js"></script>
+  <script src="src/search.js"></script>
+  <script src="src/ui.js"></script>
+  <script src="src/main.js"></script>
+</body>
+</html>
