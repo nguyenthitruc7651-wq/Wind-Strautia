@@ -1,0 +1,350 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+body, html {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #0b132b;
+  color: #ffffff;
+}
+
+/* Map & Canvas */
+#map {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  background: #0d1b2a;
+}
+
+#weatherCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* Leaflet Dark Customization */
+.leaflet-container {
+  background: #09111e !important;
+}
+.leaflet-control-zoom, .leaflet-control-attribution {
+  display: none !important; /* Dọn dẹp UI cho gọn */
+}
+
+/* Glassmorphism Classes */
+.glass-panel {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+/* Disclaimer Banner */
+.disclaimer-banner {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  background: rgba(220, 38, 38, 0.85);
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  pointer-events: none;
+}
+
+/* Search Box */
+.search-container {
+  position: absolute;
+  top: 40px;
+  left: 16px;
+  right: 70px;
+  max-width: 360px;
+  z-index: 10;
+  transition: all 0.3s ease;
+}
+
+.search-input-wrapper {
+  display: flex;
+  align-items: center;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 24px;
+  padding: 8px 14px;
+}
+
+.search-icon {
+  color: #94a3b8;
+  margin-right: 8px;
+}
+
+#searchInput {
+  border: none;
+  background: transparent;
+  outline: none;
+  color: white;
+  width: 100%;
+  font-size: 14px;
+}
+
+.btn-clear {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+}
+
+.search-results {
+  margin-top: 6px;
+  background: rgba(15, 23, 42, 0.95);
+  border-radius: 12px;
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.search-item {
+  padding: 10px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.search-item:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+/* Toolbar Right */
+.toolbar-right {
+  position: absolute;
+  top: 40px;
+  right: 16px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tool-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transition: transform 0.2s, background 0.2s;
+}
+
+.tool-btn:active {
+  transform: scale(0.92);
+  background: rgba(59, 130, 246, 0.8);
+}
+
+/* Layer Menu Popup */
+.layer-menu {
+  position: absolute;
+  top: 95px;
+  right: 70px;
+  width: 240px;
+  padding: 16px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.layer-menu h3 {
+  font-size: 14px;
+  color: #94a3b8;
+  margin-bottom: 4px;
+}
+
+.toggle-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* Info Card */
+.info-card {
+  position: absolute;
+  bottom: 110px;
+  left: 16px;
+  right: 16px;
+  max-width: 380px;
+  margin: 0 auto;
+  padding: 16px;
+  z-index: 10;
+}
+
+.close-card {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.info-card h3 {
+  font-size: 16px;
+  color: #60a5fa;
+  margin-bottom: 10px;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.card-item i {
+  color: #38bdf8;
+  margin-right: 4px;
+}
+
+/* Timeline Phía Dưới */
+.timeline-container {
+  position: absolute;
+  bottom: 24px;
+  left: 16px;
+  right: 16px;
+  height: 60px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+}
+
+.play-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #2563eb;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.timeline-slider-wrapper {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+#timelineRange {
+  width: 100%;
+  accent-color: #3b82f6;
+  cursor: pointer;
+}
+
+.timeline-ticks {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: #94a3b8;
+}
+
+.time-display {
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 90px;
+  text-align: right;
+  color: #f3f4f6;
+}
+
+/* Legend Legend Bar */
+.legend-bar {
+  position: absolute;
+  bottom: 88px;
+  right: 16px;
+  z-index: 10;
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+}
+
+.legend-colors {
+  display: flex;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.legend-colors span {
+  padding: 2px 5px;
+  color: #000;
+  font-weight: 700;
+  font-size: 8px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* Custom Marker cho Bão Giả Lập */
+.storm-icon-wrapper {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.storm-spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid rgba(239, 68, 68, 0.3);
+  border-top-color: #ef4444;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.storm-center-text {
+  position: absolute;
+  font-size: 10px;
+  font-weight: bold;
+  color: #ffffff;
+  text-shadow: 0 0 4px #000;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
